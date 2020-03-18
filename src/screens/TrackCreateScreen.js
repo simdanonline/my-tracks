@@ -1,68 +1,93 @@
 import React, { useContext, useCallback } from 'react';
 import { Font } from 'expo';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import {
-    
-} from 'react-native';
-import {SafeAreaView, NavigationEvents, withNavigationFocus}  from 'react-navigation'
-import {Text} from 'react-native-elements'
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView, NavigationEvents, withNavigationFocus } from 'react-navigation'
+import { Text, Header } from 'react-native-elements'
 import Map from '../components/Map';
 //import '../_mockLocation';
-import { Header, Left, Button,Icon, Title, Body, Right } from 'native-base';
-import { Context as LocationContext  } from '../context/LocationContext'
+import { Left, Button, Icon, Title, Body, Right } from 'native-base';
+import { Context as LocationContext } from '../context/LocationContext'
 import useLocation from '../hooks/useLocation';
 import TrackForm from '../components/TrackForm';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
+import {
+  AdMobBanner,
+  AdMobInterstitial,
+  PublisherBanner,
+  AdMobRewarded,
+  setTestDeviceIDAsync
+} from 'expo-ads-admob';
 
 
 
 
 const TrackCreateScreen = ({ isFocused }) => {
 
-  
 
-  const { state:{ recording }, addLocation } = useContext(LocationContext)
+
+  const { state: { recording }, addLocation } = useContext(LocationContext)
 
   const callback = useCallback(location => {
     addLocation(location, recording)
   }, [recording])
 
-  const [err] = useLocation(isFocused || recording , callback)    
+  const [err] = useLocation(isFocused || recording, callback)
   //console.log(isFocused)
 
-    
+  const bannerError = () => {
+    console.log('Couldnt load ad');
+  }
+  return (
+    <View style={{ flex: 1 }} >
+      <Header
+        centerComponent={{ text: 'Create a new track', style: { color: '#fff', fontSize: 20 } }}
+      />
 
-    return (
-        <SafeAreaView forceInset={{ top: 'always' }}>
-          <Text h3>Create a new track</Text>
 
-        
-        <Map />
-        {err ? <Text>Please enable location services</Text>  :  null}
-        <TrackForm />
-        
-        
-        
-        </SafeAreaView>
-    )
+
+      <Map />
+      {err ? <Text>Please enable location services</Text> : null}
+      <TrackForm />
+      <KeyboardSpacer topSpacing={50} />
+
+      <AdMobBanner
+        style={style.bottomBanner}
+        bannerSize="fullBanner"
+        adUnitID="ca-app-pub-1728295148749127/8418965164" // Test ID, Replace with your-admob-unit-id ca-app-pub-1728295148749127/5864179270
+        // testDeviceID="EMULATOR"
+        servePersonalizedAds // true or false
+        onDidFailToReceiveAdWithError={bannerError} />
+
+
+
+    </View>
+  )
 }
 
 
 
-TrackCreateScreen.navigationOptions =  {
-    
-        title: 'Create a new track',
-        headerStyle: {
-            backgroundColor: '#f4511e',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-    
+TrackCreateScreen.navigationOptions = {
+
+  title: 'Create a new track',
+  headerStyle: {
+    backgroundColor: '#f4511e',
+  },
+  headerTintColor: '#fff',
+  headerTitleStyle: {
+    fontWeight: 'bold',
+  },
+
 }
 
 
 
 
+const style = StyleSheet.create({
+  bottomBanner: {
+    position: 'absolute',
+    bottom: 0,
+  }
+})
 
-export default withNavigationFocus (TrackCreateScreen);
+export default withNavigationFocus(TrackCreateScreen);
