@@ -1,9 +1,10 @@
 import createDataContext from "./createDataContext";
 import trackerApi from "../api/tracker";
 import { AsyncStorage } from "react-native";
-import { navigate } from '../navigationRef';
-import axios from 'axios'
-
+import { navigate } from "../navigationRef";
+import axios from "axios";
+import { Toast } from "native-base";
+import { displayError, getErrm } from "../Constants/misc";
 
 const authReducer = (state, action) => {
   switch (action.type) {
@@ -12,126 +13,131 @@ const authReducer = (state, action) => {
     case "AUTH":
       return { errorMessage: "", token: action.payload, isLoading: false };
     case "CLEAR_ERROR":
-      return { ...state, errorMessage: "" }
+      return { ...state, errorMessage: "" };
     case "LOG_OUT":
-      return { token: "", errorMessage: "" }
+      return { token: "", errorMessage: "" };
     case "SET_LOADING":
-      return { ...state, isLoading: true }
+      return { ...state, isLoading: true };
     default:
       return state;
   }
 };
 
-const clearErrorMessage = dispatch => () => {
+const clearErrorMessage = (dispatch) => () => {
   dispatch({
-    type: "CLEAR_ERROR"
+    type: "CLEAR_ERROR",
   });
-}
+};
 
-const AutoLogin = dispatch => async () => {
+const AutoLogin = (dispatch) => async () => {
   const token = await AsyncStorage.getItem("token");
   if (token) {
     dispatch({
-      type: "AUTH"
-    })
-    navigate('TrackList');
+      type: "AUTH",
+    });
+    navigate("TrackList");
   } else {
-    navigate('Signin')
+    navigate("Signin");
   }
-}
+};
 
-
-const signUp = dispatch => async ({ email, password, username, file }) => {
+const signUp = (dispatch) => async ({
+  email,
+  password,
+  name,
+  phone,
+  avatar,
+}) => {
   dispatch({
-    type: "SET_LOADING"
-  })
-  const data = new FormData();
+    type: "SET_LOADING",
+  });
 
-  data.append('email', email);
-  data.append('username', username);
-  data.append('password', password);
-  data.append('file', {
-    type: 'image/jpg',
-    uri: file,
-    name: 'profilepic.jpg'
+  console.log(avatar);
+
+  const data = new FormData();
+  data.append("name", name);
+  data.append("email", email);
+  data.append("phone", phone);
+  data.append("password", password);
+  data.append("avatar", {
+    type: "image/jpg",
+    uri: avatar,
+    name: "profilepic.jpg",
   });
 
   const config = {
-    method: 'post',
-    url: ' https://simdan-tracks.herokuapp.com/signup',
+    method: "post",
+    url: "https://simdanonline-tracksapp.herokuapp.com/users/",
     data: data,
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'multipart/form-data'
-    }
-  }
-  //make api request to sign up with that email and password
-
-    await axios(config)
-    .then( async(res) =>{
-      console.log(res.data)
-      if(res.data.token){
-        await AsyncStorage.setItem("token", response.data.token);
-        dispatch({
+  };
+  console.log(config);
+  await axios(config)
+    .then(async (res) => {
+      console.log(res.data);
+      if (res.data.token) {
+        await AsyncStorage.setItem("token", res.data.token);
+        await dispatch({
           type: "AUTH",
-          payload: res.data.token
+          payload: res.data.token,
         });
-    
-        navigate('TrackList');
+        navigate("TrackList");
       }
     })
-    .catch( err => {
-      console.log(err)
+    .catch((err) => {
+      displayError(err)
+      console.log(err.message);
+      const errm = getErrm()
       dispatch({
         type: "ADD_ERROR",
-        payload: "Something went wrong with sign up, try again with another email"
+        payload:
+          errm,
       });
-    })
-     
-    
-  
-
-
+    });
+  //make api request to sign up with that email and password
 };
 
-const signin = dispatch => async ({ email, password }) => {
-
+const signin = (dispatch) => async ({ email, password }) => {
   dispatch({
-    type: "SET_LOADING"
-  })
+    type: "SET_LOADING",
+  });
   try {
-
-    const response = await trackerApi.post("/signin", { email, password });
+    const response = await trackerApi.post("/login", { email, password });
     await AsyncStorage.setItem("token", response.data.token);
     dispatch({
       type: "AUTH",
-      payload: response.data.token
+      payload: response.data.token,
     });
 
-    navigate('TrackList');
-
-
-
-
+    navigate("TrackList");
   } catch (err) {
+    let errm = err.message;
+    if (err.response) {
+      if (err.response.data) {
+        if (err.response.data.error) {
+          errm = err.response.data.error;
+        }
+      }
+    }
+    Toast.show({
+      type: "danger",
+      text: errm,
+      duration: 3500,
+    });
     dispatch({
       type: "ADD_ERROR",
-      payload: "Something went wrong while signing in, please check you've enter correct  details"
-    })
-
+      payload:
+        errm,
+    });
   }
 };
 
-
-const signout = dispatch => async () => {
+const signout = (dispatch) => async () => {
   await AsyncStorage.removeItem("token");
   dispatch({
-    type: "LOG_OUT"
+    type: "LOG_OUT",
   });
-  navigate('loginFlow')
-
+  navigate("loginFlow");
 };
-
 
 export const { Provider, Context } = createDataContext(
   authReducer,

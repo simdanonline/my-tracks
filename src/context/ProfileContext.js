@@ -26,12 +26,13 @@ const loggedin = dispatch => async () => {
     const token = await AsyncStorage.getItem('token');
     const config = {
         method: 'get',
-        url: ' https://simdan-tracks.herokuapp.com/me',
+        url: ' https://simdanonline-tracksapp.herokuapp.com/users/me',
         headers: { 'Authorization': 'Bearer ' + token },
       }
-      console.log(config)
+     // console.log(config)
        await axios(config)
        .then(res => {
+        // console.log(res)
             dispatch({
               type: "FETCH_USER",
               payload: res.data

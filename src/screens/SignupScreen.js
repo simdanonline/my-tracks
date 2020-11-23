@@ -22,33 +22,48 @@ const SignupScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [CorrectEmail, setCorrect] = useState('')
-    const [ username, setUsername ] = useState('')
+    const [ name, setUsername ] = useState('')
     const { height, width } = Dimensions.get('window')
-    const [file, setPic] = useState('')
+    const [avatar, setPic] = useState('')
+    const [ phone, setPhone ] = useState('')
+    console.log(avatar)
 
     const checkForm = () => {
-        if (!email || !password) {
-            return Alert.alert('Please enter email address and password')
+        if(!name){
+            return Alert.alert('Please enter a username')
+        }
+        
+        if(!email){
+            return Alert.alert('Email is required')
+        }
+        if(!password){
+            return Alert.alert("Please enter a password")
+        }
+
+        if(!phone){
+            return Alert.alert('Please enter a phone number')
+        }
+        if(!avatar){
+            return Alert.alert('Please select a profile picture')
         }
         clearErrorMessage()
         setCorrect('')
-        validate(email, password)
+        validate(email, password, name, avatar)
 
 
     }
 
-    const validate = (email, password) => {
-        console.log(email);
+    const validate = (email, password, name, avatar) => {
+        // console.log(email);
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if (reg.test(email) === false) {
-            console.log("Email is Not Correct");
             return setCorrect('Please enter a valid email address');
         }
-        else {
-            signUp({ email, password, username, file })
+      
+            signUp({ email, password, name, phone, avatar })
             //this.setState({ email: text })
-            console.log("Email is Correct");
-        }
+            // console.log("Email is Correct");
+        
     }
 
     const Button = ({ onPress, children }) => (
@@ -78,7 +93,7 @@ const SignupScreen = ({ navigation }) => {
             quality: 0.7
           });
       
-          console.log(result);
+          console.log(result.uri);
       
           if (!result.cancelled) {
              setPic(result.uri);
@@ -112,17 +127,21 @@ const SignupScreen = ({ navigation }) => {
                 </Spacer>
                 <Spacer>
 
-                    <View style={{ alignItems: 'center' }}>
-                        <Image style={style.image} source={{ uri: file }} />
-                        <View style={style.row}>
-                            <Button onPress={select}>Set profile picture</Button>
-                        </View>
-                    </View>
+                <View style={{ justifyContent: 'center', alignItems:'center', marginVertical: 20 }} >
+            <Image 
+            style={{ height: 150, width: 150, borderRadius: 75, backgroundColor:'#ccc' }}
+            source={{uri: avatar }} />
+            <TouchableOpacity style={{ backgroundColor: '#ccc', marginTop:5, padding:5, borderRadius: 9 }} onPress={() => select()} >
+            <Text> Select Image </Text>
+            </TouchableOpacity>
+            </View>
+
+                
 
                     <TextInput
                         placeholder="Username"
                         placeholderTextColor="black"
-                        value={username}
+                        value={name}
                         onChangeText={setUsername}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -145,6 +164,16 @@ const SignupScreen = ({ navigation }) => {
                         onChangeText={setPassword}
                         autoCapitalize="none"
                         autoCorrect={false}
+                        style={style.input} />
+
+<TextInput
+                        placeholder="Phone number"
+                        placeholderTextColor="black"
+                        value={phone}
+                        onChangeText={setPhone}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        keyboardType={'number-pad'}
                         style={style.input} />
 
                 </Spacer>

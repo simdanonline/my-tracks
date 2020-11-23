@@ -4,18 +4,22 @@
     "slug": "tracks",
     "privacy": "public",
     "sdkVersion": "36.0.0",
-
     "android": {
       "package": "com.simdanonline.mytracks",
+      "versionCode": 4,
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-1728295148749127~2118593777",
+        "googleMobileAdsAppId": "ca-app-pub-1260827830857642~4271967096",
         "googleMaps": {
           "apiKey": "AIzaSyAcCl9uHISIroc-mzl3H_AMm4ApCIDUKQA"
         }
       }
     },
-    "platforms": ["ios", "android", "web"],
-    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "version": "3.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -26,13 +30,15 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-1728295148749127~2118593777"
-      }
+        "googleMobileAdsAppId": "ca-app-pub-1260827830857642~4271967096"
+      },
+      "bundleIdentifier": "com.simdanonline.mytracks"
     }
   }
 }
